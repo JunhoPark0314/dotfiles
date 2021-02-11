@@ -1,0 +1,105 @@
+#! /bin/bash
+
+#
+# bspwmrc
+#
+
+xrdb -merge $HOME/.Xresources
+
+#!/bin/sh
+bspc rule -r "*"
+
+###---Autostart---###
+#nm-applet &0
+#xrdb ~/.Xresources &
+#hsetroot -cover ~/.config/wall.png &
+#flameshot &
+#fcitx -d &
+
+#killall bspswallow
+#pidof bspswallow | bspswallow &
+polybar DP-1-1 &
+polybar DP-4 &
+polybar DP-2 &
+
+###---MONITORS---###
+bspc monitor DP-1-1 -d 1 2 3 4
+bspc monitor DP-4 -d 5 6 7 8 9 
+bspc monitor DP-2 -d 10 11
+
+###---Global Settings---###
+bspc config automatic_scheme alternate
+bspc config initial_polarity second_child
+bspc config pointer_modifier lock
+bspc config pointer_action1 move
+bspc config pointer_action2 resize_side
+bspc config pointer_action3 resize_corner
+bspc config click_to_focus none
+
+bspc config focus_follows_pointer true
+bspc config remove_disabled_monitors true
+bspc config remove_unplugged_monitors true
+bspc config merge_overlapping_monitors true
+
+bspc config normal_border_color	"#4c566a"
+bspc config active_border_color	"#1e1e1e"
+bspc config focused_border_color "#5733FF"
+bspc config presel_feedback_color	"#327bd1"
+bspc config urgent_border_color "#dd2727"
+
+###---Monitor And Desktop Settings----###
+bspc config top_padding 0
+bspc config bottom_padding 0
+bspc config left_padding 0
+bspc config right_padding 0
+bspc config border_width 6
+bspc config window_gap 10
+
+###---Initial setup ---###
+
+
+# center monitor
+bspc node @1:/ -i
+bspc node @1:/ -o 0.2 -p south -i
+
+bspc rule --add Code:code -o node=@1:/1
+bspc rule --add Alacritty:code -o node=@1:/2
+
+code &
+alacritty --class code -e bash -c "bash tmux"&
+
+# left monitor
+bspc node @5:/ -i
+bspc node @5:/ -o 0.2 -p south -i
+bspc node @6:/ -i
+bspc node @7:/ -i
+bspc node @8:/ -i
+
+bspc rule --add dolphin:dolphin -o node=@5:/1
+bspc rule --add Alacritty:vclab-local -o node=@5:/2
+bspc rule --add Alacritty:vclab-server-14 -o node=@6:/
+bspc rule --add Alacritty:vclab-server-20 -o node=@7:/
+bspc rule --add Alacritty:vclab-server-27 -o node=@8:/
+
+dolphin &
+alacritty --class vclab-local -e bash -c "bash $HOME/.bash_profile && $HOME/.config/tmux/startup.sh" &
+alacritty --class vclab-server-14 -e bash -c "bash $HOME/.bash_profile && ssh -p 1214 vclab@vclab-server-14" &
+alacritty --class vclab-server-20 -e bash -c "bash $HOME/.bash_profile && ssh vclab@vclab-server-20" &
+alacritty --class vclab-server-27 -e bash -c "bash $HOME/.bash_profile && ssh vclab@vclab-server-27" &
+
+
+# right monitor
+bspc node @10:/ -i
+bspc node @10:/ -o 0.15 -p south -i
+
+bspc rule --add youtube-music-desktop-app:youtube-music-desktop-app -o node=@10:/1
+bspc rule --add Google-chrome:google-chrome  -o node=@10:/2
+
+google-chrome &
+youtube-music-desktop-app &
+
+bspc rule --add Zathura state=tiled desktop='^11'
+
+picom -b --config $XDG_CONFIG_HOME/picom/picom.conf &
+feh --bg-fill $HOME/wallpaper/back.jpg
+sxhkd &
