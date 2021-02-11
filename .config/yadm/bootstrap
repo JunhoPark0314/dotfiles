@@ -1,10 +1,21 @@
+#!/bin/bash
+
+cd "$HOME"
 # update base installations
 sudo pacman -Syu
+
+# install vim
+sudo pacman -S vim
 
 # install yay 
 sudo pacman -S --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
+cd "$HOME"
 
+# install nodejs
+curl -sL install-node.now.sh/lts | sudo bash
 
+echo "Init submodules"
+yadm submodule update --recursive --init
